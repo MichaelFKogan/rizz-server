@@ -1,7 +1,5 @@
 const express = require('express');
-const multer = require('multer');
 const axios = require('axios');
-const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
@@ -10,18 +8,6 @@ const port = 3000;
 
 app.use(express.json()); // Middleware to parse JSON requests
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files (if needed)
-
-// Middleware to handle file uploads with a temporary destination
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, '/tmp'); // Save files in the /tmp directory
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename
-    },
-});
-
-const upload = multer({ storage: storage });
 
 // OCR endpoint to process image and return GPT-4 response
 app.post('/process-image', upload.single('image'), async (req, res) => {
