@@ -40,16 +40,14 @@ app.post('/process-image', upload.single('image'), async (req, res) => {
         // const worker = await createWorker("eng")
 
         const worker = await createWorker({
-            workerPath: '/path/to/worker.js',
-            langPath: '/path/to/languages',
-            wasmPath: 'https://your-cdn-url/tesseract-core-simd.wasm', // Set this to where your wasm file is hosted
+            wasmPath: '/tesseract-core-simd.wasm', // Path to the wasm file in the public folder
           });
           
 
         // const worker = createWorker();
-        // await worker.load();
-        // await worker.loadLanguage('eng');
-        // await worker.initialize('eng');
+        await worker.load();
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
 
         // Perform OCR on the uploaded image
         const { data: { text } } = await worker.recognize(imagePath);
