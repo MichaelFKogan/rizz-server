@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-const { createWorker } = require('tesseract.js');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
