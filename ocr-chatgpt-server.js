@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 
 // Serve static files (e.g., images)
 // app.use(express.static('uploads'));
-app.use(express.static(path.join(__dirname, 'server')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // OCR endpoint to process image and return GPT-4 response
 app.post('/process-image', upload.single('image'), async (req, res) => {
