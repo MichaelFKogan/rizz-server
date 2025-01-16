@@ -16,7 +16,7 @@
         "dest": "/chatgpt-server.js"
       },
       {
-        "src": "/ocr-chat",
+        "src": "/process-image",
         "dest": "/ocr-chatgpt-server.js"
       }
     ]
