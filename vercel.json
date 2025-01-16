@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "chatgpt-server.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/chat",
+        "dest": "/chatgpt-server.js"
+      }
+    ]
+  }
+  
