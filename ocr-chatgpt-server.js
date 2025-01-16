@@ -24,8 +24,8 @@ const storage = multer.diskStorage({
   const upload = multer({ storage: storage });
 
 // Serve static files (e.g., images)
-app.use(express.static('uploads'));
-
+// app.use(express.static('uploads'));
+app.use(express.static(path.join(__dirname, 'server')));
 
 // OCR endpoint to process image and return GPT-4 response
 app.post('/process-image', upload.single('image'), async (req, res) => {
@@ -40,7 +40,8 @@ app.post('/process-image', upload.single('image'), async (req, res) => {
         // const worker = await createWorker("eng")
 
         const worker = await createWorker({
-            wasmPath: '/server/tesseract-core-simd.wasm',
+            wasmPath: '/tesseract-core-simd.wasm',
+
           });
           
 
