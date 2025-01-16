@@ -40,7 +40,7 @@ app.post('/process-image', upload.single('image'), async (req, res) => {
         // const worker = await createWorker("eng")
 
         const worker = await createWorker({
-            wasmPath: '/tesseract-core-simd.wasm', // Path to the wasm file in the public folder
+            wasmPath: '/server/tesseract-core-simd.wasm',
           });
           
 
