@@ -10,7 +10,7 @@ app.use(express.json()); // Middleware to parse JSON requests
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files (if needed)
 
 // OCR endpoint to process image and return GPT-4 response
-app.post('/process-image', upload.single('image'), async (req, res) => {
+app.post('/process-image', async (req, res) => {
     if (!req.body.text) {
         return res.status(400).send('No text provided.');
     }
