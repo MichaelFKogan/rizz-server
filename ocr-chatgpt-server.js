@@ -11,11 +11,21 @@ require('dotenv').config();
 const app = express();
 const port = 3000;
 
-// Middleware to handle file uploads
-const upload = multer({ dest: 'uploads/' });
+// Middleware to handle file uploads with a temporary destination
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, '/tmp'); // Save files in the /tmp directory (available in serverless environments)
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename for each file
+    },
+  });
+  
+  const upload = multer({ storage: storage });
 
 // Serve static files (e.g., images)
 app.use(express.static('uploads'));
+
 
 // OCR endpoint to process image and return GPT-4 response
 app.post('/process-image', upload.single('image'), async (req, res) => {
