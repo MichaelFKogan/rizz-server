@@ -1,5 +1,3 @@
-// ocr-chatgpt-server.js
-
 const express = require('express');
 const multer = require('multer');
 const { createWorker } = require('tesseract.js');
@@ -11,64 +9,41 @@ require('dotenv').config();
 const app = express();
 const port = 3000;
 
+app.use(express.json()); // Middleware to parse JSON requests
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files (if needed)
+
 // Middleware to handle file uploads with a temporary destination
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, '/tmp'); // Save files in the /tmp directory (available in serverless environments)
+        cb(null, '/tmp'); // Save files in the /tmp directory
     },
     filename: function (req, file, cb) {
-      cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename for each file
+        cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename
     },
-  });
-  
-  const upload = multer({ storage: storage });
+});
 
-// Serve static files (e.g., images)
-// app.use(express.static('uploads'));
-app.use(express.static(path.join(__dirname, 'public')));
+const upload = multer({ storage: storage });
 
 // OCR endpoint to process image and return GPT-4 response
 app.post('/process-image', upload.single('image'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No image uploaded.');
+    if (!req.body.text) {
+        return res.status(400).send('No text provided.');
     }
 
-    const imagePath = path.join(__dirname, req.file.path);
-
+    const userText = req.body.text;
     try {
-        // Initialize Tesseract worker
-        // const worker = await createWorker("eng")
-
-        const worker = await createWorker({
-            wasmPath: path.join(__dirname, 'public', 'tesseract-core-simd.wasm'), // Absolute path
-          });
-          
-          
-
-        // const worker = createWorker();
-        await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
-
-        // Perform OCR on the uploaded image
-        const { data: { text } } = await worker.recognize(imagePath);
-
-        // Remove the uploaded file after processing
-        fs.unlinkSync(imagePath);
-
-        // Send the extracted text to GPT-4 API
-        const response = await fetchGPTResponse(text);
-
-        res.json({ extractedText: text, gptResponse: response });
+        // Fetch GPT-4 response
+        const gptResponse = await fetchGPTResponse(userText);
+        res.json({ extractedText: userText, gptResponse: gptResponse });
     } catch (error) {
         console.error('Error processing image:', error);
         res.status(500).send('An error occurred while processing the image.');
     }
 });
 
-// Function to fetch GPT-4 response based on the OCR extracted text
+// Function to fetch GPT-4 response based on the text from the client
 async function fetchGPTResponse(userInput) {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY; // This should be in your .env file
     const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
     const body = {
@@ -77,10 +52,9 @@ async function fetchGPTResponse(userInput) {
             {
                 role: 'system',
                 content: `
-                You are Rizz GPT, a smart, funny, and approachable chatbot designed to help young Gen Z individuals, both guys and girls, with relationship advice, especially in dating scenarios.
-                Users will upload screenshots of text conversations or dating app chats (like Tinder or Hinge), and you will provide them with the best possible response.
-
-                Keep responses brief (2 sentences max) and use a casual, upbeat tone. Use light humor, and 1 emoji is allowed per response.
+                    You are Rizz GPT, a smart, funny, and approachable chatbot designed to help young Gen Z individuals, both guys and girls, with relationship advice, especially in dating scenarios.
+                    Users will upload screenshots of text conversations or dating app chats (like Tinder or Hinge), and you will provide them with the best possible response.
+                    Keep responses brief (2 sentences max) and use a casual, upbeat tone. Use light humor, and 1 emoji is allowed per response.
                 `,
             },
             { role: 'user', content: `Here’s the image text: "${userInput}". Respond with a witty message for a dating situation.` },
@@ -95,7 +69,7 @@ async function fetchGPTResponse(userInput) {
 
     try {
         const result = await axios.post(apiUrl, body, { headers });
-        return result.data.choices[0].message.content;
+        return result.data.choices[0].message.content; // Return the GPT-4 response
     } catch (error) {
         console.error('Error fetching GPT-4 response:', error);
         return 'Sorry, I couldn’t generate a response at the moment.';
