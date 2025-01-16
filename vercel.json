@@ -4,12 +4,20 @@
       {
         "src": "chatgpt-server.js",
         "use": "@vercel/node"
+      },
+      {
+        "src": "ocr-chatgpt-server.js",
+        "use": "@vercel/node"
       }
     ],
     "routes": [
       {
         "src": "/chat",
         "dest": "/chatgpt-server.js"
+      },
+      {
+        "src": "/ocr-chat",
+        "dest": "/ocr-chatgpt-server.js"
       }
     ]
   }
