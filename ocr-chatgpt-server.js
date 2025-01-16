@@ -37,7 +37,15 @@ app.post('/process-image', upload.single('image'), async (req, res) => {
 
     try {
         // Initialize Tesseract worker
-        const worker = await createWorker("eng")
+        // const worker = await createWorker("eng")
+
+        const worker = await createWorker({
+            workerPath: '/path/to/worker.js',
+            langPath: '/path/to/languages',
+            wasmPath: 'https://your-cdn-url/tesseract-core-simd.wasm', // Set this to where your wasm file is hosted
+          });
+          
+
         // const worker = createWorker();
         // await worker.load();
         // await worker.loadLanguage('eng');
