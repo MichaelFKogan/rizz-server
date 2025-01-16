@@ -37,10 +37,11 @@ app.post('/process-image', upload.single('image'), async (req, res) => {
 
     try {
         // Initialize Tesseract worker
-        const worker = createWorker();
-        await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
+        const worker = await createWorker("eng")
+        // const worker = createWorker();
+        // await worker.load();
+        // await worker.loadLanguage('eng');
+        // await worker.initialize('eng');
 
         // Perform OCR on the uploaded image
         const { data: { text } } = await worker.recognize(imagePath);
